@@ -10,7 +10,7 @@ namespace MyWebApi.Models
         public string TenHangHoa { get; set; }
         public double DonGia { get; set; }
     }
-    public class HangHoa : HangHoaVm
+    public class HangHoa1 : HangHoaVm
     {
         public Guid MaHangHoa { get; set; }
     }

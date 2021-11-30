@@ -1,10 +1,9 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using MyWebApi.Data;
 using MyWebApi.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace MyWebApi.Controllers
 {
@@ -12,22 +11,28 @@ namespace MyWebApi.Controllers
     [ApiController]
     public class HangHoaController : ControllerBase
     {
-        public static List<HangHoa> hangHoas = new List<HangHoa>();
+        private readonly MyDbContext _context;
+        public HangHoaController(MyDbContext context)
+        {
+            _context = context;
+        }
         [HttpGet]
         public IActionResult GetAll()
         {
+            var hangHoas = _context.HangHoas.ToList();
             return Ok(hangHoas);
         }
         [HttpPost]
         public IActionResult Create(HangHoaVm hangHoaVm)
         {
-            var hangHoa = new HangHoa
+            var hangHoa = new Data.HangHoa()
             {
-                MaHangHoa = Guid.NewGuid(),
-                TenHangHoa = hangHoaVm.TenHangHoa,
+                MaHh = Guid.NewGuid(),
+                TenHh = hangHoaVm.TenHangHoa,
                 DonGia = hangHoaVm.DonGia
             };
-            hangHoas.Add(hangHoa);
+            _context.HangHoas.Add(hangHoa);
+            _context.SaveChanges();
             return Ok(new
             {
                 Success = true,
@@ -39,7 +44,7 @@ namespace MyWebApi.Controllers
         {
             try
             {
-                var hangHoa = hangHoas.SingleOrDefault(hh => hh.MaHangHoa == Guid.Parse(id));
+                var hangHoa = _context.HangHoas.SingleOrDefault(hh => hh.MaHh == Guid.Parse(id));
                 if (hangHoa == null)
                 {
                     return NotFound();
@@ -53,22 +58,23 @@ namespace MyWebApi.Controllers
             }
         }
         [HttpPut("{id}")]
-        public IActionResult Edit(string id, HangHoa hangHoaEdit)
+        public IActionResult Edit(string id, HangHoa1 hangHoaEdit)
         {
             try
             {
-                var hangHoa = hangHoas.SingleOrDefault(hh => hh.MaHangHoa == Guid.Parse(id));
+                var hangHoa = _context.HangHoas.SingleOrDefault(hh => hh.MaHh == Guid.Parse(id));
                 if (hangHoa == null)
                 {
                     return NotFound();
                 }
                 //Update
-                if (id != hangHoa.MaHangHoa.ToString())
+                if (id != hangHoa.MaHh.ToString())
                 {
                     return BadRequest();
                 }
-                hangHoa.TenHangHoa = hangHoaEdit.TenHangHoa;
+                hangHoa.TenHh = hangHoaEdit.TenHangHoa;
                 hangHoa.DonGia = hangHoaEdit.DonGia;
+                _context.SaveChanges();
                 return Ok();
             }
             catch
@@ -82,17 +88,18 @@ namespace MyWebApi.Controllers
         {
             try
             {
-                var hangHoa = hangHoas.SingleOrDefault(hh => hh.MaHangHoa == Guid.Parse(id));
+                var hangHoa = _context.HangHoas.SingleOrDefault(hh => hh.MaHh == Guid.Parse(id));
                 if (hangHoa == null)
                 {
                     return NotFound();
                 }
                 //Update
-                if (id != hangHoa.MaHangHoa.ToString())
+                if (id != hangHoa.MaHh.ToString())
                 {
                     return BadRequest();
                 }
-                hangHoas.Remove(hangHoa); 
+                _context.Remove(hangHoa);
+                _context.SaveChanges();
                 return Ok();
             }
             catch

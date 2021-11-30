@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using MyWebApi.Data;
 using MyWebApi.Models;
@@ -35,6 +36,7 @@ namespace MyWebApi.Controllers
             return Ok(loai);
         }
         [HttpPost]
+        [Authorize]
         public IActionResult Create (LoaiVm loaiVm)
         {
             try
