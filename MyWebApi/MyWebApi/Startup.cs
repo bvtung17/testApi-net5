@@ -11,6 +11,8 @@ using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using MyWebApi.Data;
+using MyWebApi.Models;
+using MyWebApi.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -33,11 +35,13 @@ namespace MyWebApi
         {
 
             services.AddControllers();
+            services.AddTransient<ILoaiReponsitory, LoaiReponsitory>();
+            services.Configure<AppSetting>(Configuration.GetSection("AppSettings"));
             services.AddDbContext<MyDbContext>(option =>
             {
                 option.UseSqlServer(Configuration.GetConnectionString("MyDb"));
             });
-            var secretKey = Configuration["AppSettings: SecretKey"];
+            var secretKey = Configuration["AppSettings:SecretKey"];
             var secretKeyBytes = Encoding.UTF8.GetBytes(secretKey);
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(opt =>
             {
@@ -70,7 +74,7 @@ namespace MyWebApi
             app.UseHttpsRedirection();
 
             app.UseRouting();
-
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
